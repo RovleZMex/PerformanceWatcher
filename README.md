@@ -227,7 +227,7 @@ Desarrollado para monitoreo de procesos en tiempo real con .NET y WinForms.
 
 - .NET Team por las excelentes APIs de monitoreo
 - Comunidad de WinForms por los componentes de visualización
-- Microsoft.Chart.Controls por los gráficos
+- ScottPlot por la biblioteca de gráficos moderna y eficiente
 
 ---
 

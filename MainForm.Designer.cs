@@ -1,6 +1,6 @@
 using System.Drawing;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting;
+using ScottPlot.WinForms;
 
 namespace PerformanceWatcher
 {
@@ -18,7 +18,7 @@ namespace PerformanceWatcher
         private Button removeProcessButton;
         private DataGridView metricsDataGridView;
         private Panel chartPanel;
-        private Chart performanceChart;
+        private FormsPlot performanceChart;
         private Panel chartControlsPanel;
         private ComboBox metricTypeComboBox;
         private ComboBox viewModeComboBox;
@@ -45,8 +45,6 @@ namespace PerformanceWatcher
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            ChartArea chartArea = new ChartArea();
-            Legend legend = new Legend();
 
             // Form settings
             this.AutoScaleDimensions = new SizeF(8F, 16F);
@@ -320,36 +318,11 @@ namespace PerformanceWatcher
                 this.autoScaleCheckBox
             });
 
-            // Performance Chart
-            this.performanceChart = new Chart
+            // Performance Chart (ScottPlot)
+            this.performanceChart = new FormsPlot
             {
-                Dock = DockStyle.Fill,
-                BackColor = Color.White
+                Dock = DockStyle.Fill
             };
-
-            chartArea.Name = "MainChartArea";
-            chartArea.BackColor = Color.White;
-            chartArea.BorderColor = Color.FromArgb(200, 200, 200);
-            chartArea.BorderWidth = 1;
-            chartArea.BorderDashStyle = ChartDashStyle.Solid;
-            chartArea.AxisX.Title = "Time (seconds)";
-            chartArea.AxisX.TitleFont = new Font("Segoe UI", 10F, FontStyle.Bold);
-            chartArea.AxisX.LabelStyle.Font = new Font("Segoe UI", 8F);
-            chartArea.AxisX.MajorGrid.LineColor = Color.FromArgb(220, 220, 220);
-            chartArea.AxisX.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
-            chartArea.AxisY.Title = "Value";
-            chartArea.AxisY.TitleFont = new Font("Segoe UI", 10F, FontStyle.Bold);
-            chartArea.AxisY.LabelStyle.Font = new Font("Segoe UI", 8F);
-            chartArea.AxisY.MajorGrid.LineColor = Color.FromArgb(220, 220, 220);
-            chartArea.AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
-
-            this.performanceChart.ChartAreas.Add(chartArea);
-
-            legend.Name = "MainLegend";
-            legend.Docking = Docking.Right;
-            legend.Font = new Font("Segoe UI", 8F);
-            legend.BackColor = Color.Transparent;
-            this.performanceChart.Legends.Add(legend);
 
             this.chartPanel.Controls.Add(this.performanceChart);
             this.chartPanel.Controls.Add(this.chartControlsPanel);

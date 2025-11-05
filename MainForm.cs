@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting;
+using ScottPlot;
 
 namespace PerformanceWatcher
 {
@@ -23,6 +23,7 @@ namespace PerformanceWatcher
             InitializeApplication();
             SetupEventHandlers();
             SetupDataGridView();
+            InitializeChart();
         }
 
         private void InitializeApplication()
@@ -34,6 +35,15 @@ namespace PerformanceWatcher
             // Start the refresh timer
             refreshTimer.Tick += RefreshTimer_Tick;
             refreshTimer.Start();
+        }
+
+        private void InitializeChart()
+        {
+            performanceChart.Plot.Title("Process Performance Monitor");
+            performanceChart.Plot.XLabel("Time (seconds)");
+            performanceChart.Plot.YLabel("Value");
+            performanceChart.Plot.Grid(true);
+            performanceChart.Refresh();
         }
 
         private void SetupEventHandlers()
@@ -269,8 +279,7 @@ namespace PerformanceWatcher
         {
             try
             {
-                var chart = performanceChart;
-                chart.Series.Clear();
+                performanceChart.Plot.Clear();
 
                 var maxTimeSeconds = (int)maxTimeSecondsNumeric.Value;
                 var isAggregated = viewModeComboBox.SelectedIndex == 1;
@@ -286,23 +295,26 @@ namespace PerformanceWatcher
                     var aggregatedData = _metricsCollector?.GetAggregatedHistoricalData(maxTimeSeconds);
                     if (aggregatedData != null && aggregatedData.Count > 0)
                     {
-                        var series = new Series("Total")
-                        {
-                            ChartType = SeriesChartType.Line,
-                            BorderWidth = 3,
-                            Color = Color.FromArgb(0, 120, 215)
-                        };
+                        var xData = new List<double>();
+                        var yData = new List<double>();
 
                         int dataIndex = 0;
                         foreach (var data in aggregatedData)
                         {
                             var value = GetMetricValue(data, metricType);
                             var timeOffset = minSeconds + dataIndex;
-                            series.Points.AddXY(timeOffset, value);
+                            xData.Add(timeOffset);
+                            yData.Add(value);
                             dataIndex++;
                         }
 
-                        chart.Series.Add(series);
+                        if (xData.Count > 0)
+                        {
+                            var scatter = performanceChart.Plot.Add.Scatter(xData, yData);
+                            scatter.LineWidth = 2;
+                            scatter.Color = ScottPlot.Color.FromColor(System.Drawing.Color.FromArgb(0, 120, 215));
+                            scatter.LegendText = "Total";
+                        }
                     }
                 }
                 else
@@ -316,50 +328,52 @@ namespace PerformanceWatcher
                         if (historicalData == null || historicalData.Count == 0)
                             continue;
 
-                        var series = new Series(processName)
-                        {
-                            ChartType = SeriesChartType.Line,
-                            BorderWidth = 2,
-                            Color = _processColors.ContainsKey(processName)
-                                ? _processColors[processName]
-                                : GenerateRandomColor()
-                        };
+                        var xData = new List<double>();
+                        var yData = new List<double>();
 
                         int dataIndex = 0;
                         foreach (var data in historicalData)
                         {
                             var value = GetMetricValue(data, metricType);
                             var timeOffset = minSeconds + dataIndex;
-                            series.Points.AddXY(timeOffset, value);
+                            xData.Add(timeOffset);
+                            yData.Add(value);
                             dataIndex++;
                         }
 
-                        chart.Series.Add(series);
+                        if (xData.Count > 0)
+                        {
+                            var scatter = performanceChart.Plot.Add.Scatter(xData, yData);
+                            scatter.LineWidth = 2;
+
+                            var color = _processColors.ContainsKey(processName)
+                                ? _processColors[processName]
+                                : GenerateRandomColor();
+                            scatter.Color = ScottPlot.Color.FromColor(color);
+                            scatter.LegendText = processName;
+                        }
                     }
                 }
 
                 // Configure axes
-                var chartArea = chart.ChartAreas[0];
-                chartArea.AxisX.Minimum = minSeconds;
-                chartArea.AxisX.Maximum = maxSeconds > minSeconds ? maxSeconds : minSeconds + 1;
-                chartArea.AxisX.Title = $"Time (seconds) - Window: {minSeconds} to {maxSeconds}";
+                performanceChart.Plot.Axes.SetLimitsX(minSeconds, maxSeconds > minSeconds ? maxSeconds : minSeconds + 1);
+                performanceChart.Plot.XLabel($"Time (seconds) - Window: {minSeconds} to {maxSeconds}");
 
                 // Y-axis configuration
                 var metricNames = new[] { "CPU %", "Memory (MB)", "Network Download (KB/s)", "Network Upload (KB/s)" };
-                chartArea.AxisY.Title = metricNames[metricType];
+                performanceChart.Plot.YLabel(metricNames[metricType]);
 
                 if (autoScaleCheckBox.Checked)
                 {
-                    chartArea.AxisY.Minimum = 0;
-                    chartArea.AxisY.Maximum = double.NaN; // Auto scale
+                    performanceChart.Plot.Axes.AutoScale();
                 }
                 else
                 {
-                    chartArea.AxisY.Minimum = 0;
-                    chartArea.AxisY.Maximum = (double)maxValueNumeric.Value;
+                    performanceChart.Plot.Axes.SetLimitsY(0, (double)maxValueNumeric.Value);
                 }
 
-                chart.Invalidate();
+                performanceChart.Plot.ShowLegend();
+                performanceChart.Refresh();
             }
             catch (Exception ex)
             {
