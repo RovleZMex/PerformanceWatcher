@@ -42,7 +42,11 @@ namespace PerformanceWatcher
             performanceChart.Plot.Title("Process Performance Monitor");
             performanceChart.Plot.XLabel("Time (seconds)");
             performanceChart.Plot.YLabel("Value");
-            performanceChart.Plot.Grid(true);
+
+            // Configure grid
+            performanceChart.Plot.Grid.MajorLineColor = ScottPlot.Color.FromHex("#e0e0e0");
+            performanceChart.Plot.Grid.IsVisible = true;
+
             performanceChart.Refresh();
         }
 
@@ -445,7 +449,7 @@ namespace PerformanceWatcher
                 if (searchPanel != null)
                     searchPanel.Width = Math.Max(300, (this.ClientSize.Width - 60) / 2);
 
-                if (monitorPanel != null)
+                if (monitorPanel != null && searchPanel != null)
                 {
                     monitorPanel.Left = searchPanel.Right + 10;
                     monitorPanel.Width = searchPanel.Width;
