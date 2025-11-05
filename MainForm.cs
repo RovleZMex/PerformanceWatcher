@@ -12,7 +12,7 @@ namespace PerformanceWatcher
     {
         private MetricsCollector? _metricsCollector;
         private ProcessMonitor? _processMonitor;
-        private readonly Dictionary<string, Color> _processColors = new();
+        private readonly Dictionary<string, System.Drawing.Color> _processColors = new();
         private readonly Random _random = new();
         private DateTime _startTime;
         private int _elapsedSeconds = 0;
@@ -407,21 +407,21 @@ namespace PerformanceWatcher
             UpdateChart();
         }
 
-        private Color GenerateRandomColor()
+        private System.Drawing.Color GenerateRandomColor()
         {
             // Generate vibrant colors
             var colors = new[]
             {
-                Color.FromArgb(0, 120, 215),   // Blue
-                Color.FromArgb(16, 137, 62),   // Green
-                Color.FromArgb(232, 17, 35),   // Red
-                Color.FromArgb(255, 140, 0),   // Orange
-                Color.FromArgb(138, 43, 226),  // Purple
-                Color.FromArgb(0, 153, 188),   // Cyan
-                Color.FromArgb(255, 20, 147),  // Pink
-                Color.FromArgb(255, 215, 0),   // Gold
-                Color.FromArgb(0, 128, 128),   // Teal
-                Color.FromArgb(218, 112, 214)  // Orchid
+                System.Drawing.Color.FromArgb(0, 120, 215),   // Blue
+                System.Drawing.Color.FromArgb(16, 137, 62),   // Green
+                System.Drawing.Color.FromArgb(232, 17, 35),   // Red
+                System.Drawing.Color.FromArgb(255, 140, 0),   // Orange
+                System.Drawing.Color.FromArgb(138, 43, 226),  // Purple
+                System.Drawing.Color.FromArgb(0, 153, 188),   // Cyan
+                System.Drawing.Color.FromArgb(255, 20, 147),  // Pink
+                System.Drawing.Color.FromArgb(255, 215, 0),   // Gold
+                System.Drawing.Color.FromArgb(0, 128, 128),   // Teal
+                System.Drawing.Color.FromArgb(218, 112, 214)  // Orchid
             };
 
             return colors[_random.Next(colors.Length)];
